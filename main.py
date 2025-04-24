@@ -10,6 +10,7 @@ app = FastAPI()
 class TextInput(BaseModel):
     text: str
     output_format: str = "base64"  # Default output is base64, but can be binary
+    text_speaker: str = "id_female_icha"  # Default voice
 
 
 # Split the text into chunks based on max length
@@ -22,7 +23,7 @@ def split_text_into_chunks(text, max_length=280):
     return chunks
 
 # Generate audio for each chunk
-def generate_audio(chunk):
+def generate_audio(chunk, text_speaker="id_female_icha"):
     url = "https://api.tiktokv.com/media/api/text/speech/invoke/"
     headers = {
         "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
@@ -33,7 +34,7 @@ def generate_audio(chunk):
         "req_text": chunk,
         "speaker_map_type": 0,
         "aid": 1233,
-        "text_speaker": "id_female_icha"
+        "text_speaker": text_speaker
     }
     response = requests.post(url, headers=headers, data=data)
     response_json = response.json()
@@ -63,13 +64,14 @@ def concatenate_base64_mp3(encoded_files):
 async def tts_endpoint(input: TextInput, response: Response):
     text = input.text
     output_format = input.output_format.lower()
+    text_speaker = input.text_speaker
     
     # Split the input text into chunks if it's too long
     chunks = split_text_into_chunks(text)
     
     base64_strings = []
     for chunk in chunks:
-        base64_string = generate_audio(chunk)
+        base64_string = generate_audio(chunk, text_speaker)
         base64_strings.append(base64_string)
     
     # Concatenate the base64 audio strings
