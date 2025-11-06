@@ -4,7 +4,7 @@ from pydantic import BaseModel
 import requests
 import base64
 import json
-
+import os
 app = FastAPI()
 
 # Add CORS middleware
