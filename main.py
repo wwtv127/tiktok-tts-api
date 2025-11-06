@@ -177,3 +177,9 @@ async def tts_openai_endpoint(input_data: OpenAITTSInput):
     
     # Return as JSON with audio_base64 field
     return {"audio_base64": audio_base64}
+
+if __name__ == "__main__":
+    import uvicorn
+    port = int(os.environ.get("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
+
